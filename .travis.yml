@@ -19,8 +19,7 @@ install:
   - pip install -r requirements.txt
 
 script:
-  - python setup.py sdist >/dev/null
-  - nosetests --with-coverage --cover-package=clusterpy;
+  - nosetests --with-coverage --verbose --cover-package=clusterpy;
   #- cd doc; make pickle; make doctest
 notifications:
     email:

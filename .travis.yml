@@ -1,25 +1,30 @@
 language: python
+sudo: false
 python:
-#  - "3.3"
+  - 3.6
   - 2.7
-#  - "2.6"
-
-virtualenv:
-  system_site_packages: true
 
 before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -y python-dev
-  - sudo apt-get install -y python-numpy
-  - sudo apt-get install -y python-scipy
-  - sudo apt-get install -y python-pip
+  - wget https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+  - chmod +x miniconda.sh
+  - ./miniconda.sh -b -p ./miniconda
+  - export PATH=`pwd`/miniconda/bin:$PATH
+  - conda update --yes conda
+  - conda config --add channels conda-forge
+  - conda create -y -q -n test-env python=$TRAVIS_PYTHON_VERSION
+  - source activate test-env
 
 install:
-  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then pip install --allow-external Polygon2 --allow-unverified Polygon2 Polygon2; fi
-  - pip install nose
-  - pip install matplotlib
+  - conda install --yes pip
+  - pip install -r requirements.txt
 
-script:  nosetests
-
+script:
+  - python setup.py sdist >/dev/null
+  - nosetests --with-coverage --cover-package=clusterpy;
+  #- cd doc; make pickle; make doctest
 notifications:
-  email: false
+    email:
+        recipients:
+            - levi.john.wolf@gmail.com
+        on_failure: always
+        on_change: always
